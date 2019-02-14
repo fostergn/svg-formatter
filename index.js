@@ -39,6 +39,8 @@ const parser = new xml2js.Parser();
 
       SVGObject.children = gElement
 
+      console.log(`string it my dude: `, stringify(SVGObject))
+
       // const svgFile = await fsPromises.writeFile(argv.file, newXML)
 
       // console.log(`wrote that file`)
