@@ -14,6 +14,8 @@ const formatSVGFile = async (fileName) => {
 
   const defsElement = SVGObject.children.find(child => child.name === `defs`)
 
+  let path = ``
+
   if (isNil(defsElement)) {
 
     console.log(`no <defs> element for ${fileName}`)
@@ -21,13 +23,20 @@ const formatSVGFile = async (fileName) => {
     return
   }
 
-  const path = defsElement.children.find(child => child.name === `path`)
+  path = defsElement.children.find(child => child.name === `path`)
 
   if (isNil(path)) {
 
-    console.log(`no <path> element for ${fileName}`)
+    path = defsElement.children.find(child => child.name === `polygon`)
 
-    return
+    if (isNil(path)) {
+
+      console.log(`no <path> element for ${fileName}`)
+
+      return
+    }
+
+    path.attributes.fill = `black`
   }
 
   const gElement = SVGObject.children.find(child => child.name === `g`)
