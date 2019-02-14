@@ -5,50 +5,73 @@ const svgson = require('svgson')
 const { stringify } = svgson
 const fs = require('fs')
 const fsPromises = fs.promises;
+const isNil = require('lodash.isnil')
 
 const builder = new xml2js.Builder();
 const parser = new xml2js.Parser();
 
-(async () => {
+const formatSVGFile = async (fileName) => {
+
+  const svgFile = await fsPromises.readFile(fileName, `utf8`)
+
+  const SVGObject = await svgson.parse(svgFile)
+
+  const defsElement = SVGObject.children.find(child => child.name === `defs`)
+
+  if (isNil(defsElement)) {
+
+    console.log(`no <defs> element for ${fileName}`)
+
+    return
+  }
+
+  const path = defsElement.children.find(child => child.name === `path`)
+
+  if (isNil(path)) {
+
+    console.log(`no <path> element for ${fileName}`)
+
+    return
+  }
+
+  const gElement = SVGObject.children.find(child => child.name === `g`)
+
+  gElement.attributes.fill = `black`
+
+  const newGElement = Object.assign({}, gElement, {
+    children: [
+      path
+    ]
+  })
+
+  SVGObject.children = [newGElement]
+
+  const newSVGString = stringify(SVGObject)
+
+  await fsPromises.writeFile(fileName, newSVGString, `utf8`)
+
+  console.log(`finished writing file: ${fileName}`)
+}
+
+const main = async () => {
 
   try {
 
     if (argv.file) {
 
-      const svgFile = await fsPromises.readFile(argv.file, `utf8`)
-
-      const SVGObject = await svgson.parse(svgFile)
-
-      const defsElement = SVGObject.children.find(child => child.name === `defs`)
-
-      const path = defsElement.children.find(child => child.name === `path`)
-
-      console.log(`path: `, path)
-
-      const gElement = SVGObject.children.find(child => child.name === `g`)
-
-      console.log(`gElemetn: `, gElement)
-
-      const newGElement = Object.assign(gElement, {
-        children: [
-          path
-        ]
-      })
-
-      console.log(`newGElement: `, newGElement)
-
-      SVGObject.children = gElement
-
-      console.log(`string it my dude: `, stringify(SVGObject))
-
-      // const svgFile = await fsPromises.writeFile(argv.file, newXML)
-
-      // console.log(`wrote that file`)
+      await formatSVGFile(argv.file)
     }
 
     else if (argv.directory) {
 
+      const directoryFileNames = await fsPromises.readdir(argv.directory)
 
+      const svgFileNames = directoryFileNames.filter(file => file.includes(`.svg`))
+
+      await Promise.all(svgFileNames.map(file => formatSVGFile(`${argv.directory}${file}`)))
+
+      console.log(`-----------------------------------------------------`)
+      console.log(`finished processing svgs in ${argv.directory}`)
     }
 
     else {
@@ -59,4 +82,6 @@ const parser = new xml2js.Parser();
 
     console.log(`error: `, err)
   }
-})()
+}
+
+main()

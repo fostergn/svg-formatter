@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "lodash.isnil": "^4.0.0",
     "svgson": "^3.0.0",
     "xml2js": "^0.4.19",
     "yargs": "^13.1.0"
