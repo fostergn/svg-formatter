@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 const argv = require('yargs').argv
-const xml2js = require('xml2js')
 const svgson = require('svgson')
 const { stringify } = svgson
 const fs = require('fs')
 const fsPromises = fs.promises;
 const isNil = require('lodash.isnil')
-
-const builder = new xml2js.Builder();
-const parser = new xml2js.Parser();
 
 const formatSVGFile = async (fileName) => {
 
