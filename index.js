@@ -44,6 +44,7 @@ const formatSVGFile = async (fileName) => {
   if(isNil(gElement)) {
 
     gElement = {
+      name: `g`,
       attributes: {},
       children: []
     }
