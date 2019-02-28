@@ -39,7 +39,15 @@ const formatSVGFile = async (fileName) => {
     path.attributes.fill = `black`
   }
 
-  const gElement = SVGObject.children.find(child => child.name === `g`)
+  let gElement = SVGObject.children.find(child => child.name === `g`)
+
+  if(isNil(gElement)) {
+
+    gElement = {
+      attributes: {},
+      children: []
+    }
+  }
 
   gElement.attributes.fill = `black`
 
